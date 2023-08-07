@@ -30,7 +30,7 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @OneToMany(mappedBy = "categoriesCreer", cascade = CascadeType.ALL)
-    @JsonIgnoreProperties("User")
-    private List<Category> categoriesCreer;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnoreProperties("user")
+    private List<Budget> budgetsCreer;
 }
