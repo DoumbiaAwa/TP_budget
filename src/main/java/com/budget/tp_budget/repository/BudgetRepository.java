@@ -1,4 +1,15 @@
 package com.budget.tp_budget.repository;
 
-public interface BudgetRepository {
+import com.budget.tp_budget.entity.Budget;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.time.LocalDate;
+
+@Repository
+public interface BudgetRepository extends JpaRepository<Budget, Integer> {
+
+    Budget findById(int id);
+
+
 }
