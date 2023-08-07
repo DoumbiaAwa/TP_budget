@@ -1,6 +1,13 @@
 package com.budget.tp_budget.controller;
 
+import com.budget.tp_budget.entity.Budget;
+import com.budget.tp_budget.entity.Category;
 import com.budget.tp_budget.entity.Depense;
+import com.budget.tp_budget.entity.User;
+import com.budget.tp_budget.repository.BudgetRepository;
+import com.budget.tp_budget.repository.CategoryRepository;
+import com.budget.tp_budget.repository.UserRepository;
+import com.budget.tp_budget.service.CategoryService;
 import com.budget.tp_budget.service.DepenseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -12,10 +19,35 @@ import java.util.List;
 public class DepenseController {
     @Autowired
     private DepenseService depenseService;
+    @Autowired
+    private UserRepository userRepository;
 
-    @PostMapping("/creer")
-    public Depense creer(@RequestBody Depense depense) {
-        return depenseService.creerDepense(depense);
+    @Autowired
+    private CategoryService categoryService;
+
+    @Autowired
+    private BudgetRepository budgetRepository;
+
+    @PostMapping("/user/{user_id}/category/{category_id}/create")
+    public Depense creer(@RequestBody Depense depense, @PathVariable("user_id") Long user_id, @PathVariable("category_id") Long cat_id) {
+        User user = userRepository.findById(Math.toIntExact(user_id));
+        Category category = categoryService.getCategoryById(cat_id);
+
+        if (user != null && category != null) {
+            depense.setUser(user);
+            depense.setCategory(category);
+            Budget budget = budgetRepository.findLastBudget(category.getBudgets());
+            Long montantBudget = (long) budget.getAmount();
+            if (montantBudget > depense.getMontant()) {
+                budget.setAmount((int) (montantBudget - depense.getMontant()));
+                budgetRepository.save(budget);
+                return depenseService.creerDepense(depense);
+            } else {
+                //notificationService.sendNotification(user, "Budget insuffisant");
+            }
+
+        }
+        return null;
     }
 
     @GetMapping("/{depense_id}")
@@ -61,5 +93,10 @@ public class DepenseController {
                 total += depense.getMontant();
         }
         return List.of(total, depenses);
+    }
+
+    @GetMapping("/categorie/{category_id}")
+    public List<Depense> totalDepenseCategorie(@PathVariable("categorie") Long category_id) {
+      return depenseService.getAllDepenseByCategorie(category_id);
     }
 }

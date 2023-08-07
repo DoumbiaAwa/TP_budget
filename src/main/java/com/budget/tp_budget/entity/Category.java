@@ -16,5 +16,17 @@ public class Category {
     @Column(nullable = false)
     private String name;
 
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    private List<Depense> depenses;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    private List<Notification> notifications;
+
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    private List<Budget> budgets;
 
 }

@@ -31,4 +31,8 @@ public class DepenseService {
     public List<Depense> getAllDepenseByPeriode(String periode) {
         return depenseRepository.findAllByOrderByPeriode(periode);
     }
+
+    public List<Depense> getAllDepenseByCategorie(Long category_id) {
+        return depenseRepository.findAllByOrderByCategorie(category_id);
+    }
 }

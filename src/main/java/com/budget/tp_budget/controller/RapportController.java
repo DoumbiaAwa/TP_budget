@@ -1,6 +1,5 @@
 package com.budget.tp_budget.controller;
 
-import com.budget.tp_budget.entity.Rapport;
 import com.budget.tp_budget.service.RapportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

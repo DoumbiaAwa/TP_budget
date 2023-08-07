@@ -27,4 +27,12 @@ public class Depense {
     @Column (nullable = false)
     private String periode;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
+
 }
