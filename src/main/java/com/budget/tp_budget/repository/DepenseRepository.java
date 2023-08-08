@@ -12,4 +12,7 @@ public interface DepenseRepository extends JpaRepository<Depense, Long> {
 
     @Query (value = "SELECT * FROM depense WHERE periode = :periode", nativeQuery = true)
     List<Depense> findAllByOrderByPeriode(String periode);
+
+    @Query (value = "SELECT * FROM depense WHERE category_id = :category_id", nativeQuery = true)
+    List<Depense> findAllByOrderByCategorie(Long category_id);
 }
