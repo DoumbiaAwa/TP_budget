@@ -39,7 +39,7 @@ public class DepenseController {
             Long montantBudget = (long) budget.getAmount();
             if (montantBudget > depense.getMontant()) {
                 budget.setAmount((int) (montantBudget - depense.getMontant()));
-                budgetRepository.save(budget);
+               // budgetRepository.save(budget);
                 return depenseService.creerDepense(depense);
             } else {
                 //notificationService.sendNotification(user, "Budget insuffisant");

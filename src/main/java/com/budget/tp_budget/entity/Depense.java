@@ -24,8 +24,6 @@ public class Depense {
     @Column (nullable = false)
     private String description;
 
-    @Column (nullable = false)
-    private String periode;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
