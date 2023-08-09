@@ -1,7 +1,9 @@
 package com.budget.tp_budget.controller;
 
 import com.budget.tp_budget.entity.Category;
+import com.budget.tp_budget.entity.User;
 import com.budget.tp_budget.service.CategoryService;
+import com.budget.tp_budget.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,36 +11,48 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/categories")
+@RequestMapping("/api/users/{userId}/categories")
 public class CategoryController {
     @Autowired
     private CategoryService categoryService;
+    @Autowired
+    private UserService userService;
 
-    // Endpoint pour créer une catégorie en utilisant la méthode HTTP POST.
-    // Le corps de la requête doit contenir un objet JSON avec le nom de la catégorie.
-    @PostMapping
-    public ResponseEntity<Category> createCategory(@RequestBody Category category) {
-        Category savedCategory = categoryService.saveCategory(category);
-        return ResponseEntity.ok(savedCategory);
-    }
-
-    // Endpoint pour récupérer toutes les catégories en utilisant la méthode HTTP GET.
+    // Récupère toutes les catégories d'un utilisateur
     @GetMapping
-    public ResponseEntity<List<Category>> getAllCategories() {
-        List<Category> categories = categoryService.getAllCategories();
-        return ResponseEntity.ok(categories);
+    public List<Category> getAllCategoriesForUser(@PathVariable Long userId) {
+        return categoryService.getAllCategoriesForUser(userId);
     }
 
-    // Endpoint pour récupérer une catégorie par son ID en utilisant la méthode HTTP GET.
-    // L'ID de la catégorie est spécifié dans l'URL.
-    // Si l'ID n'existe pas, le endpoint renverra une réponse avec un statut 404 (Not Found).
+    // Crée une nouvelle catégorie
+    @PostMapping
+    public ResponseEntity<Category> createCategory(@PathVariable Long userId, @RequestBody Category category) {
+        // Assurez-vous que l'utilisateur existe
+        User user = userService.getUserById(userId);
+
+        category.setUser(user);
+        Category createdCategory = categoryService.createCategory(category);
+        return ResponseEntity.ok(createdCategory);
+    }
+
+
+    // Récupère une catégorie par son ID
     @GetMapping("/{id}")
-    public ResponseEntity<Category> getCategoryById(@PathVariable Long id) {
+    public ResponseEntity<Category> getCategory(@PathVariable Long userId, @PathVariable Long id) {
+        // Assurez-vous que l'utilisateur existe (vérification non montrée dans cet exemple)
+        User user = userService.getUserById(userId);
+
         Category category = categoryService.getCategoryById(id);
-        if (category != null) {
-            return ResponseEntity.ok(category);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+
+        return ResponseEntity.ok(category);
+    }
+
+    // Supprime une catégorie par son ID
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCategory(@PathVariable Long userId, @PathVariable Long id) {
+        // Assurez-vous que l'utilisateur existe
+        User user = userService.getUserById(userId);
+        categoryService.deleteCategory(id);
+        return ResponseEntity.noContent().build();
     }
 }

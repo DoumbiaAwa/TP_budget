@@ -46,5 +46,7 @@ public class UserService {
         }else throw new EntityExistsException("user doesn't exist");
     }
 
-
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId.intValue());
+    }
 }

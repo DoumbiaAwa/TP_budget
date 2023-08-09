@@ -12,19 +12,24 @@ public class CategoryService {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    // Méthode pour sauvegarder une catégorie dans la base de données.
-    public Category saveCategory(Category category) {
+    // Crée une nouvelle catégorie
+    public Category createCategory(Category category) {
         return categoryRepository.save(category);
     }
 
-    // Méthode pour récupérer toutes les catégories depuis la base de données.
-    public List<Category> getAllCategories() {
-        return categoryRepository.findAll();
+    // Récupère toutes les catégories d'un utilisateur
+    public List<Category> getAllCategoriesForUser(Long userId) {
+        return categoryRepository.findByUserId(userId);
     }
 
-    // Méthode pour récupérer une catégorie par son ID depuis la base de données.
-    // Si l'ID n'existe pas, la méthode renvoie null.
+    // Récupère une catégorie par son ID
     public Category getCategoryById(Long id) {
-        return categoryRepository.findById(id).orElse(null);
+        return categoryRepository.findById(id)
+                .orElseThrow();
+    }
+
+    // Supprime une catégorie par son ID
+    public void deleteCategory(Long id) {
+        categoryRepository.deleteById(id);
     }
 }
