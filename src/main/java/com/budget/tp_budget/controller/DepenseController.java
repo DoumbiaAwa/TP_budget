@@ -5,7 +5,6 @@ import com.budget.tp_budget.entity.Category;
 import com.budget.tp_budget.entity.Depense;
 import com.budget.tp_budget.entity.User;
 import com.budget.tp_budget.repository.BudgetRepository;
-import com.budget.tp_budget.repository.CategoryRepository;
 import com.budget.tp_budget.repository.UserRepository;
 import com.budget.tp_budget.service.CategoryService;
 import com.budget.tp_budget.service.DepenseService;
@@ -95,8 +94,8 @@ public class DepenseController {
         return List.of(total, depenses);
     }
 
-    @GetMapping("/categorie/{category_id}")
-    public List<Depense> totalDepenseCategorie(@PathVariable("categorie") Long category_id) {
+    @GetMapping("/categories/{category_id}")
+    public List<Depense> totalDepenseCategory(@PathVariable("category_id") Long category_id) {
       return depenseService.getAllDepenseByCategorie(category_id);
     }
 }
