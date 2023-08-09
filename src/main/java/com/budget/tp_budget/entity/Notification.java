@@ -25,8 +25,4 @@ public class Notification {
 
   @OneToOne
   private Depense depense;
-
-  @OneToMany
-  private Budget budget;
-
 }

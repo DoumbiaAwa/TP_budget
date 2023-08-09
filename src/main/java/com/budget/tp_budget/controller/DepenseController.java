@@ -1,16 +1,15 @@
 package com.budget.tp_budget.controller;
 
-import com.budget.tp_budget.entity.Budget;
-import com.budget.tp_budget.entity.Category;
-import com.budget.tp_budget.entity.Depense;
-import com.budget.tp_budget.entity.User;
+import com.budget.tp_budget.entity.*;
 import com.budget.tp_budget.repository.BudgetRepository;
 import com.budget.tp_budget.repository.UserRepository;
 import com.budget.tp_budget.service.CategoryService;
 import com.budget.tp_budget.service.DepenseService;
+import com.budget.tp_budget.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -18,35 +17,40 @@ import java.util.List;
 public class DepenseController {
     @Autowired
     private DepenseService depenseService;
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private CategoryService categoryService;
 
     @Autowired
     private BudgetRepository budgetRepository;
 
-    @PostMapping("/user/{user_id}/category/{category_id}/create")
-    public Depense creer(@RequestBody Depense depense, @PathVariable("user_id") Long user_id, @PathVariable("category_id") Long cat_id) {
-        User user = userRepository.findById(Math.toIntExact(user_id));
-        Category category = categoryService.getCategoryById(cat_id);
+    @Autowired
+    private NotificationService notificationService;
 
-        if (user != null && category != null) {
-            depense.setUser(user);
-            depense.setCategory(category);
-            Budget budget = budgetRepository.findLastBudget(category.getBudgets());
-            Long montantBudget = (long) budget.getAmount();
-            if (montantBudget > depense.getMontant()) {
-                budget.setAmount((int) (montantBudget - depense.getMontant()));
-               // budgetRepository.save(budget);
-                return depenseService.creerDepense(depense);
-            } else {
-                //notificationService.sendNotification(user, "Budget insuffisant");
-            }
-
-        }
-        return null;
+    @PostMapping("/create")
+    public Depense creer(@RequestBody Depense depense) {
+        double montant = depense.getMontant();
+        Budget budget = depense.getBudget();
+        depense.setBudget(budget);
+        double montantCourant = budget.getMontantCourant();
+        double reste = montantCourant - montant;
+      if (montant <= montantCourant) {
+          budget.setMontantCourant((int) reste);
+          depenseService.creerDepense(depense);
+          budgetRepository.save(budget);
+          if (reste <= (0.1 * budget.getAmount())) {
+              Notification notification = new Notification();
+              notification.setType("alert");
+              notification.setMessage("Attention budget presque atteint!" + budget.getCategory().getName() + " Montant restant : " + budget.getMontantCourant());
+              notification.setDate(String.valueOf(LocalDate.now()));
+              notification.setDepense(depense);
+              notificationService.saveNotification(notification);
+              notificationService.sendEmail(
+                  budget.getUser().getEmail(),
+                  "Budget faible",
+                  " " + notification.getMessage() + " " + notification.getDate());
+          }
+         // return depenseService.creerDepense(depense);
+          throw new RuntimeException("Depense faite avec success");
+      }
+        throw new RuntimeException("Depense trop élevée pour le budget");
     }
 
     @GetMapping("/{depense_id}")
@@ -61,13 +65,20 @@ public class DepenseController {
 
     @DeleteMapping("/delete/{depense_id}")
     public void deleteDepense(@PathVariable("depense_id") Long id) {
+        Depense depense = depenseService.getDepenseById(id);
+        Budget budget = depense.getBudget();
+        double montantCourant = budget.getMontantCourant();
+        double montant = depense.getMontant();
+        double reste = montantCourant + montant;
+        budget.setMontantCourant((int) reste);
+        budgetRepository.save(budget);
         depenseService.deleteDepense(id);
     }
 
     @PutMapping("/update/{depense_id}")
     public Depense updateDepense(@PathVariable("depense_id") Long id, @RequestBody Depense depense) {
         Depense depense1 = depenseService.getDepenseById(id);
-        depense1.setTitre(depense.getTitre());
+        //depense1.setTitre(depense.getTitre());
         depense1.setMontant(depense.getMontant());
         depense1.setDate(depense.getDate());
         depense1.setDescription(depense.getDescription());

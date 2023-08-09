@@ -13,9 +13,6 @@ public class Depense {
     private Long id;
 
     @Column (nullable = false)
-    private String titre;
-
-    @Column (nullable = false)
     private Date date;
 
     @Column (nullable = false)
@@ -24,13 +21,11 @@ public class Depense {
     @Column (nullable = false)
     private String description;
 
+    @ManyToOne
+    @JoinColumn(name = "budget_id")
+    private Budget budget;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
-
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    private Category category;
-
+    @JoinColumn(name = "periode_id")
+    private Periode periode;
 }
