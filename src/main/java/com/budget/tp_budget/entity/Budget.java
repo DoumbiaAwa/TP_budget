@@ -26,6 +26,9 @@ public class Budget {
     @Min(value = 5000, message = "le montant ne pas etre inferieur a 5000 FCFA")
     private int amount;
 
+    @Column(nullable = false)
+    private int montantCourant;
+
     @ManyToOne
     @JoinColumn(name = "idUser", nullable = false)
     private User user;
